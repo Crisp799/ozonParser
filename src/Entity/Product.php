@@ -37,10 +37,6 @@ class Product
      */
     private $reviews_count;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $seller_id;
 
     /**
      * @ORM\Column(type="datetime")
@@ -51,6 +47,12 @@ class Product
      * @ORM\Column(type="datetime")
      */
     private $updated_date;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Seller::class, inversedBy="id")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $seller_id;
 
 
     public function getId(): ?int
@@ -106,17 +108,6 @@ class Product
         return $this;
     }
 
-    public function getSellerId(): ?int
-    {
-        return $this->seller_id;
-    }
-
-    public function setSellerId(int $seller_id): self
-    {
-        $this->seller_id = $seller_id;
-
-        return $this;
-    }
 
     public function getCreatedDate(): ?\DateTimeInterface
     {
@@ -138,6 +129,18 @@ class Product
     public function setUpdatedDate(\DateTimeInterface $updated_date): self
     {
         $this->updated_date = $updated_date;
+
+        return $this;
+    }
+
+    public function getSellerId(): ?Seller
+    {
+        return $this->seller_id;
+    }
+
+    public function setSellerId(?Seller $seller_id): self
+    {
+        $this->seller_id = $seller_id;
 
         return $this;
     }
