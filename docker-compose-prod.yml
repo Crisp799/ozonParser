@@ -7,7 +7,7 @@ services:
       build:
         context: ./docker/
         args:
-          - "BUILD_ARGUMENT_ENV=prod"
+          - "BUILD_ARGUMENT_ENV=dev"
         dockerfile: ./nginx/Dockerfile
       container_name: ${COMPOSE_PROJECT_NAME}_nginx
       restart: always
