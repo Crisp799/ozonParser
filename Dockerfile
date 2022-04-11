@@ -73,7 +73,7 @@ RUN chmod u+x /tmp/do_we_need_security-checker.sh && /tmp/do_we_need_security-ch
 
 # install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN chmod +x /usr/bin/composer
+RUN chmod +x /usr/bin/composer 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 # add supervisor
