@@ -52,8 +52,12 @@ class Product
      * @ORM\ManyToOne(targetEntity=Seller::class, inversedBy="id")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $seller_id;
+    private $seller;
 
+    public function __toString(): string
+    {
+        return $this->name.' '.$this->price;
+    }
 
     public function getId(): ?int
     {
@@ -135,12 +139,12 @@ class Product
 
     public function getSellerId(): ?Seller
     {
-        return $this->seller_id;
+        return $this->seller;
     }
 
     public function setSellerId(?Seller $seller_id): self
     {
-        $this->seller_id = $seller_id;
+        $this->seller = $seller_id;
 
         return $this;
     }
