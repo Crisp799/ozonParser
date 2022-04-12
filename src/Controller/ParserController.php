@@ -9,6 +9,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use GuzzleHttp\Handler;
+use GuzzleHttp\Client;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,10 +61,22 @@ class ParserController extends AbstractDashboardController
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $formData = $form->getData();
-            echo $formData['query'];
+            $this->getHTML($formData['query']);
+            //cho $formData['query'];
         }
         //return $this->redirect($url);
         return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView()]);
+    }
+
+    public function  getHTML($url = '') {
+        $client = new Client();
+        $res = $client->request('GET', $url);
+
+        echo $res->getStatusCode();
+// "200"
+        echo $res->getHeader('content-type')[0];
+// 'application/json; charset=utf8'
+        echo $res->getBody();
     }
 
     public function configureDashboard(): Dashboard

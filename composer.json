@@ -36,6 +36,7 @@
 		"doctrine/orm": "^2.10",
 		"dukecity/command-scheduler-bundle": "^4.0",
 		"easycorp/easyadmin-bundle": "^4",
+		"guzzlehttp/guzzle": "^7.4",
 		"imagine/imagine": "^1.2",
 		"lorenzo/pinky": "^1.0",
 		"phpdocumentor/reflection-docblock": "^5.3",
