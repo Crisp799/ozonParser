@@ -25,6 +25,7 @@
 		"php": "^8.1.4",
 		"ext-amqp": "*",
 		"ext-ctype": "*",
+		"ext-dom": "20031129",
 		"ext-iconv": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",

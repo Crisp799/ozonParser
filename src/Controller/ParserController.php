@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\CssSelector\CssSelectorConverter;
+
 
 class ParserController extends AbstractDashboardController
 {
@@ -59,13 +62,17 @@ class ParserController extends AbstractDashboardController
 
         $form = $this->createForm(SearchFormType::class);
         $form->handleRequest($request);
+
+        $goodsArray=[];
         if ($form->isSubmitted()) {
             $formData = $form->getData();
-            $this->getHTML($formData['query']);
+            //$this->getGoods($formData['query']);
+            $goodsArray = $this->getGoods($formData['query']);
+
             //cho $formData['query'];
         }
         //return $this->redirect($url);
-        return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView()]);
+        return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'goods' => $goodsArray]);
     }
 
     public function  getHTML($url = '') {
@@ -73,10 +80,45 @@ class ParserController extends AbstractDashboardController
         $res = $client->request('GET', $url);
 
         echo $res->getStatusCode();
-// "200"
-        echo $res->getHeader('content-type')[0];
+        if ($res->getStatusCode() == 200) {
+            //$this->getHTML($res->getBody());
+            $htmlData = $res->getBody();
+            //echo $res->getBody();
+            $this->getGoods($htmlData);
+        }
+        //echo $res->getHeader('content-type')[0];
 // 'application/json; charset=utf8'
         echo $res->getBody();
+    }
+
+    public function getGoods($url) {
+        $client = new Client();
+
+        $crawler = new Crawler();
+        $crawler -> addHtmlContent(file_get_contents($url));
+        //echo $crawler->html();
+        $goodsArray =[];
+        echo count($crawler);
+        $html = '';
+        //$product = $crawler->filter('.n4i');
+        $converter = new CssSelectorConverter();
+        //$product = $crawler->filterXPath($converter->toXPath('div.in6'));
+        $product = $crawler->filter('.n4i .in6');
+        //$links = $crawler ->filter('.n4i > a');
+        //var_dump($links);
+        echo count($product);
+        //забираем весь блок с кроссовками
+        foreach ($product as $domElement) {
+            array_push($goodsArray, $domElement->textContent);
+            //var_dump($domElement);
+            /*foreach($domElement->childNodes as $node) {
+                $html .= $domElement->ownerDocument->saveHTML($node);
+                $html .='\n';
+            }*/
+        }
+        //file_put_contents('2.txt', $html);
+        //echo $html;
+        return $goodsArray;
     }
 
     public function configureDashboard(): Dashboard

@@ -6,4 +6,11 @@
     {{ form_widget(form.query)}}
     {{ form_widget(form.search, { 'attr': {'class': 'btn btn-primary'} }) }}
     {{ form_end(form) }}
+    <p>
+        {% for good in goods %}
+        <li>{{ good }}</li></n>
+        {% endfor %}
+    </p>
 {% endblock main %}
+
+
