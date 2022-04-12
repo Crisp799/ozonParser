@@ -1,5 +1,10 @@
 {% extends '@!EasyAdmin/layout.html.twig' %}
 
 {% block main %}
-    {{ form(form) }}
-{% endblock %}
+
+    {{ form_start(form) }}
+    {{ form_row(form.query)}}
+    {{ form_row(form.search, { 'attr': {'class': 'btn btn-primary'} }) }}
+
+    {{ form_end(form) }}
+{% endblock main %}

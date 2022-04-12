@@ -13,10 +13,11 @@ class SearchFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('url', null, [
+            ->add('query', null, [
                 'label' => 'Your URL: ',
             ], UrlType::class)
-            ->add('submit', SubmitType::class)        ;
+            ->add('search', SubmitType::class)
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
