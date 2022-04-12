@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Form\SearchFormType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -25,9 +26,9 @@ class ParserController extends AbstractDashboardController
         //return parent::index();
         $routeBuilder = $this->container->get(AdminUrlGenerator::class);
         $url = $routeBuilder->setController(ProductCrudController::class)->generateUrl();
-
-        return $this->redirect($url);
-        //return $this->render('Parser/parserUrl.html.twig');
+        $form = $this->createForm(SearchFormType::class);
+        //return $this->redirect($url);
+        return $this->render('bundles/EasyAdminBundle/layout.html.twig', ['form' => $form->createView()]);
 
         // Option 1. You can make your dashboard redirect to some common page of your backend
         //
@@ -49,11 +50,18 @@ class ParserController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('URL Parser')
-            ->setTitle('<form>
+            ->setTitle('URL Parser');
+            /*->setTitle('<form>
     <input value="url" name="url">
     <button type="submit">Parse!</button>
-</form>');
+</form>');*/
+    }
+
+    public function form() {
+        $form = $this->createFormBuilder()
+            ->add('url', TextType::class)
+            ->add('save', SubmitType::class, ['label' => 'Create Task']);
+        return $form;
     }
 
     public function configureMenuItems(): iterable
