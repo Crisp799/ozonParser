@@ -67,14 +67,15 @@ class ParserController extends AbstractDashboardController
         if ($form->isSubmitted()) {
             $formData = $form->getData();
             //$this->getGoods($formData['query']);
-            $goodsArray = $this->getGoods($formData['query']);
+            $controller = new ParserServiceController();
+            $goodsArray = $controller->getGoods($formData['query']);
 
             //cho $formData['query'];
         }
         //return $this->redirect($url);
         return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'goods' => $goodsArray]);
     }
-
+/*
     public function  getHTML($url = '') {
         $client = new Client();
         $res = $client->request('GET', $url);
@@ -98,15 +99,18 @@ class ParserController extends AbstractDashboardController
         $crawler -> addHtmlContent(file_get_contents($url));
         //echo $crawler->html();
         $goodsArray =[];
-        echo count($crawler);
+        //echo count($crawler);
         $html = '';
         //$product = $crawler->filter('.n4i');
         $converter = new CssSelectorConverter();
-        //$product = $crawler->filterXPath($converter->toXPath('div.in6'));
-        $product = $crawler->filter('.n4i .in6');
+        //$product = $crawler->filterXPath($converter->toXPath('html > body > div#__ozon > div.a0 > div.g2s > div.g3s > div.gt0 > div.s6g >div.i6p >div >div.pi9 >div.p9i >div.n4i'));
+        //$product = $crawler->filter('.widget-search-result-container pi9 > div >div');
         //$links = $crawler ->filter('.n4i > a');
-        //var_dump($links);
-        echo count($product);
+        //echo $product->count();
+        var_dump($product);
+        //echo $product->html();
+        $product = $crawler->filter('.n4i');
+        //echo $product->html();
         //забираем весь блок с кроссовками
         foreach ($product as $domElement) {
             array_push($goodsArray, $domElement->textContent);
@@ -114,12 +118,12 @@ class ParserController extends AbstractDashboardController
             /*foreach($domElement->childNodes as $node) {
                 $html .= $domElement->ownerDocument->saveHTML($node);
                 $html .='\n';
-            }*/
+            }
         }
         //file_put_contents('2.txt', $html);
         //echo $html;
         return $goodsArray;
-    }
+    }*/
 
     public function configureDashboard(): Dashboard
     {
