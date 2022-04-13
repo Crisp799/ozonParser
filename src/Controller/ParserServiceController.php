@@ -35,12 +35,11 @@ class ParserServiceController extends AbstractController
         //$links = $crawler->filter('.widget-search-result-container >div > div > .im7')->extract(['attr' => 'href']); // сделать зависимым не от тега
         $links = $crawler->filterXPath('//*[@id="layoutPage"]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div/div/div/a')->extract(['attr' => 'href']); // сделать зависимым не от тега
 
-        var_dump($links);
-        $prices = $crawler->filter('.ui-t');
-        foreach ($links as $link) {
-            echo $this->getSKU($link).' ';
-        }
+        //var_dump($links);
+        //$prices = $crawler->filter('.ui-t');
+        $i = 0;
         foreach ($product as $key => $domElement) {
+
             //echo $this->getProductName($domElement->textContent).' ';
             //echo $domElement->textContent.'____';
             //array_push($goodsArray, $domElement->textContent);
