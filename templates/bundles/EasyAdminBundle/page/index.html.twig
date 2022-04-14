@@ -1,5 +1,13 @@
 {% extends '@!EasyAdmin/page/content.html.twig' %}
 
 {% block main %}
-    <h1>{{ id }}</h1>
+    <h1>{{ name }}</h1>
+    <il><h2>Продавец: {{ seller }}</h2> </il>
+    <il><h2> Цена: {{ price }}р</h2></il>
+    <il><h3>Количество отзывов: {{ countOfReviews }}</h3></il>
+    <il><h3><a href="{{ ozonLink }}">Просмотреть на OZON</a></h3></il>
+    <il><h3>Внутренний ID: {{ id }}</h3></il>
+    <il><h4>SKU код товара: {{ sku }}</h4></il>
+    <il><h4>Товар отслеживается с {{ createDate }}</h4></il>
+    <il><h4>Последнее обновление {{ updated_date }}</h4></il>
 {% endblock main %}

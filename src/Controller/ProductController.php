@@ -43,9 +43,10 @@ class ProductController extends AbstractDashboardController
             'price' => $productData->getPrice(),
             'seller' => $sellerRepository->findOneBy(['id'=>$productData->getSellerId()])->getName(),
             'countOfReviews' => $productData->getReviewsCount(),
-            'createDate' => $productData->getCreatedDate(),
-            'updated_date' => $productData->getUpdatedDate(),
-            'ozonLink' => $productData->getProductLink(),
+            'createDate' => $productData->getCreatedDate()->format('Y-m-d H:i:s'),
+            'updated_date' => $productData->getUpdatedDate()->format('Y-m-d H:i:s'),
+            'ozonLink' => $productData->getOzonLink(),
+            'sku' => $productData->getSku(),
         ];
         return $this->render('bundles/EasyAdminBundle/page/index.html.twig', $param);
     }

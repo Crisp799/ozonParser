@@ -95,7 +95,7 @@ class ParserController extends AbstractDashboardController
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         //yield MenuItem::section('PARSER','fas fa-comments' );
-        yield MenuItem::linkToUrl('Parser', 'fas fa-comments', 'parser');
-        yield MenuItem::linkToUrl('Products', 'fas fa-home', 'products');
+        yield MenuItem::linkToRoute('Parser', 'fas fa-comments', 'parser');
+        yield MenuItem::linkToRoute('Products', 'fas fa-home', 'products');
     }
 }

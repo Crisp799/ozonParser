@@ -3,7 +3,7 @@ reports/*
 !reports/.gitkeep
 
 .DS_Store
-
+/public/mysql-data
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
