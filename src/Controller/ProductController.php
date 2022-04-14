@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\Seller;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,18 +34,20 @@ class ProductController extends AbstractDashboardController
     public function product(int $id = 0): Response
     {
         $productRepository = $this->entityManager->getRepository(Product::class);
-        var_dump($productData = $productRepository->findOneBy(['id'=>$id]));
+        $productData = $productRepository->findOneBy(['id'=>$id]);
         $sellerRepository = $this->entityManager->getRepository(Seller::class);
-        $seller = $sellerRepository->findOneBy(['id'=>$productData['seller_id']]);
+        $seller = $sellerRepository->findOneBy(['id'=>$productData->getSellerId()]);
         $param =[
-            'id' => $productData['id'],
-            'name' => $productData['name'],
-            'price' => $productData['price'],
-            'seller' => $sellerRepository->findOneBy(['id'=>$productData['seller_id']])['name'],
-            'countOfReviews' => $productData['reviews_count'],
-            'createDate' => $productData['created_date'],
+            'id' => $productData->getId(),
+            'name' => $productData->getName(),
+            'price' => $productData->getPrice(),
+            'seller' => $sellerRepository->findOneBy(['id'=>$productData->getSellerId()])->getName(),
+            'countOfReviews' => $productData->getReviewsCount(),
+            'createDate' => $productData->getCreatedDate(),
+            'updated_date' => $productData->getUpdatedDate(),
+            'ozonLink' => $productData->getProductLink(),
         ];
-        return $this->render('bundles/EasyAdminBundle/page/index.html.twig');
+        return $this->render('bundles/EasyAdminBundle/page/index.html.twig', $param);
     }
 
     public function configureDashboard(): Dashboard
