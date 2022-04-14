@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Form\SearchFormType;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -20,15 +21,14 @@ use Twig\Environment;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
-
 class ParserController extends AbstractDashboardController
 {
-    private $twig;
-    private $entityManager;
+    //private $twig;
+    private $em;
 
-    public function __construct(Environment $twig, EntityManagerInterface $entityManager) {
-        $this->twig = $twig;
-        $this->entityManager = $entityManager;
+    public function __construct( EntityManagerInterface $em) {
+//        $this->twig = $twig;
+        $this->em = $em;
     }
 
     #[Route('/', name: 'home')]
@@ -67,8 +67,8 @@ class ParserController extends AbstractDashboardController
         if ($form->isSubmitted()) {
             $formData = $form->getData();
             //$this->getGoods($formData['query']);
-            $controller = new ParserServiceController();
-            $goodsArray = $controller->getGoods($formData['query']);
+            $controller = new ParserServiceController($this->em);
+            $controller->getGoods($formData['query']);
 
             //cho $formData['query'];
         }

@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
-
+use App\Entity\Seller;
+use App\Entity\Product;
+use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\CssSelector\CssSelectorConverter;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ParserServiceController extends AbstractController
 {
@@ -20,8 +23,71 @@ class ParserServiceController extends AbstractController
             'controller_name' => 'ParserServiceController',
         ]);
     }*/
+    private $em;
+
+    public function __construct(EntityManagerInterface $entityManager) {
+//        $this->twig = $twig;
+        $this->em = $entityManager;
+    }
+
     public function getGoods($url) {
+        //$entityManager = $doctrine->getManager();
         $client = new Client();
+        $resp = $client->request('get', $url)->getBody()->getContents();
+        $crawler = new Crawler($resp);
+        $test = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]')->outerHtml();
+        $encodeData = stristr($test, '{"items');
+        $encodeData = stristr($encodeData, '\'></div>', true);
+        $encodeData = json_decode($encodeData, true);
+        $goodData = [
+            'seller' => $this->getSeller(strip_tags($encodeData['items'][2]['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
+            'productName' => $encodeData['items'][2]['mainState'][2]['atom']['textAtom']['text'],
+            'price' => $encodeData['items'][2]['mainState'][0]['atom']['price']['price'],
+            'countOfReviews' => $encodeData['items'][2]['mainState'][3]['atom']['rating']['count'],
+            'sku' => $encodeData['items'][2]['topRightButtons'][0]['favoriteProductMolecule']['sku'],
+        ];
+        $seller = new Seller();
+        $seller->setName($goodData['seller']);
+        $this->em->persist($seller);
+
+        // действительно выполните запросы (например, запрос INSERT)
+        $this->em->flush();
+        $product = new Product($seller);
+        $product->setName($goodData['productName']);
+        $product->setPrice(123);
+        $product->setSku($goodData['sku']);
+        $product->setReviewsCount(1234);
+        $product->setCreatedDateValue();
+        $product->setUpdatedDateValue();
+        $product->setSellerId($seller);
+        $this->em->persist($product);
+
+        // действительно выполните запросы (например, запрос INSERT)
+        $this->em->flush();
+        return $goodData;
+        //var_dump($encodeData['items']);
+        //$productData = [];
+       // $productCount = count($encodeData['items']);
+        /*for ($i = 0; $i < $productCount; ++$i) {
+            //dd($itemData);
+            //dd($encodeData['items'][$i]);
+            echo $encodeData['items'][$i]['topRightButtons'][0]['favoriteProductMolecule']['sku']; //sku
+            echo $encodeData['items'][$i]['mainState'][3]['atom']['rating']['count']; //reviews
+            echo $encodeData['items'][$i]['mainState'][2]['atom']['textAtom']['text']; //name
+            echo $encodeData['items'][$i]['mainState'][0]['atom']['price']['price']; //цена
+            echo $this->getSeller(strip_tags($encodeData['items'][$i]['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])); //seller
+            /*$goodData = [
+                'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
+                'productName' => $itemData['mainState'][2]['atom']['textAtom']['text'],
+                'price' => $itemData['mainState'][0]['atom']['price']['price'],
+                'countOfReviews' => $itemData['mainState'][3]['atom']['rating']['count'],
+                'sku' => $itemData['topRightButtons'][0]['favoriteProductMolecule']['sku'],
+            ];
+            //array_push($productData, $goodData);
+            echo "___($i)__";
+        }*/
+        //dd($productData);
+        /*$client = new Client();
 
         $crawler = new Crawler();
         $crawler -> addHtmlContent(file_get_contents($url));
@@ -49,11 +115,11 @@ class ParserServiceController extends AbstractController
                 $html .= $domElement->ownerDocument->saveHTML($node);
                 $html .='\n';
             }*/
-        }
+    }
         //file_put_contents('2.txt', $html);
         //echo $html;
-        return $goodsArray;
-    }
+        //return $goodsArray;
+
 
     public function getSeller($string) :?string
     {
