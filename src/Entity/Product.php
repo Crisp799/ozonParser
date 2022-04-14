@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Seller;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -53,6 +54,11 @@ class Product
      * @ORM\JoinColumn(nullable=false)
      */
     private $seller;
+
+    public function  __construct(Seller $productSeller)
+    {
+        $seller = $productSeller->getId();
+    }
 
     public function __toString(): string
     {
@@ -125,9 +131,25 @@ class Product
         return $this;
     }
 
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedDateValue()
+    {
+        $this->created_date = new \DateTimeImmutable();
+    }
+
     public function getUpdatedDate(): ?\DateTimeInterface
     {
         return $this->updated_date;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setUpdatedDateValue()
+    {
+        $this->updated_date = new \DateTimeImmutable();
     }
 
     public function setUpdatedDate(\DateTimeInterface $updated_date): self

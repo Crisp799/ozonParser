@@ -54,7 +54,7 @@ class ParserController extends AbstractDashboardController
         //return $this->render('Parser/parserUrl.html.twig');
     }
 
-    #[Route('/parser', name: 'admin')]
+    #[Route('/parser', name: 'parser')]
     public function searchByURL(Request $request) : Response
     {
         $routeBuilder = $this->container->get(AdminUrlGenerator::class);
@@ -75,55 +75,7 @@ class ParserController extends AbstractDashboardController
         //return $this->redirect($url);
         return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo]);
     }
-/*
-    public function  getHTML($url = '') {
-        $client = new Client();
-        $res = $client->request('GET', $url);
 
-        echo $res->getStatusCode();
-        if ($res->getStatusCode() == 200) {
-            //$this->getHTML($res->getBody());
-            $htmlData = $res->getBody();
-            //echo $res->getBody();
-            $this->getGoods($htmlData);
-        }
-        //echo $res->getHeader('content-type')[0];
-// 'application/json; charset=utf8'
-        echo $res->getBody();
-    }
-
-    public function getGoods($url) {
-        $client = new Client();
-
-        $crawler = new Crawler();
-        $crawler -> addHtmlContent(file_get_contents($url));
-        //echo $crawler->html();
-        $goodsArray =[];
-        //echo count($crawler);
-        $html = '';
-        //$product = $crawler->filter('.n4i');
-        $converter = new CssSelectorConverter();
-        //$product = $crawler->filterXPath($converter->toXPath('html > body > div#__ozon > div.a0 > div.g2s > div.g3s > div.gt0 > div.s6g >div.i6p >div >div.pi9 >div.p9i >div.n4i'));
-        //$product = $crawler->filter('.widget-search-result-container pi9 > div >div');
-        //$links = $crawler ->filter('.n4i > a');
-        //echo $product->count();
-        var_dump($product);
-        //echo $product->html();
-        $product = $crawler->filter('.n4i');
-        //echo $product->html();
-        //забираем весь блок с кроссовками
-        foreach ($product as $domElement) {
-            array_push($goodsArray, $domElement->textContent);
-            //var_dump($domElement);
-            /*foreach($domElement->childNodes as $node) {
-                $html .= $domElement->ownerDocument->saveHTML($node);
-                $html .='\n';
-            }
-        }
-        //file_put_contents('2.txt', $html);
-        //echo $html;
-        return $goodsArray;
-    }*/
 
     public function configureDashboard(): Dashboard
     {
@@ -143,6 +95,7 @@ class ParserController extends AbstractDashboardController
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         //yield MenuItem::section('PARSER','fas fa-comments' );
-        yield MenuItem::linkToCrud('Product', 'fas fa-comments', Product::class);
+        yield MenuItem::linkToUrl('Parser', 'fas fa-comments', 'parser');
+        yield MenuItem::linkToUrl('Products', 'fas fa-home', 'product');
     }
 }
