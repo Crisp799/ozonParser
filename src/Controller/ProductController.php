@@ -62,7 +62,7 @@ class ProductController extends AbstractDashboardController
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         //yield MenuItem::section('PARSER','fas fa-comments' );
-        yield MenuItem::linkToUrl('Back to parser', 'fas fa-home', 'parser');
-        yield MenuItem::linkToUrl('Product', 'fas fa-comments', 'products');
+        yield MenuItem::linkToRoute('Back to parser', 'fas fa-home', 'parser');
+        yield MenuItem::linkToRoute('Product', 'fas fa-comments', 'products');
     }
 }

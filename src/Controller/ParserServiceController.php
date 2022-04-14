@@ -52,7 +52,6 @@ class ParserServiceController extends AbstractController
         foreach ($encodeData['items'] as $itemData) {
             if(isset($itemData['multiButton']['ozonSubtitle']) ) { //&& isset($itemData['mainState'][3]['atom']['rating']['count'])
                 ++$collectDataCount;
-                dd($encodeData['items']);
                 $goodData = [
                     'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
                     'productName' => $this->getProductName($itemData['mainState']),
@@ -71,9 +70,6 @@ class ParserServiceController extends AbstractController
             ];
 
     }
-        //file_put_contents('2.txt', $html);
-        //echo $html;
-        //return $goodsArray;
 
     private function saveProduct(array $productsArray) :int
     {
@@ -107,6 +103,33 @@ class ParserServiceController extends AbstractController
 
         }
         return $addDataCount;
+    }
+
+    public function updateProduct(Product $product) {
+        $url = $product->getOzonLink();
+        $client = new Client();
+        $response = $client->request('get', $url);
+        while($response->getStatusCode() !== 200) {
+            $response = $client->request('get', $url);
+        }
+        $response = $response->getBody()->getContents();
+        $crawler = new Crawler($response); //state-searchResultsV2-311178-default-1
+        //var_dump($crawler);
+        $jsonData = $crawler->filterXPath('//script[@type="application/ld+json"]')->outerHtml();
+        $matches =[];
+        preg_match('/{.+}/', $jsonData, $matches);
+        $encodeData = json_decode($matches[0], true);
+
+        $this->updater($product, $encodeData);
+    }
+
+    public function updater(Product $product, array $dataArray)
+    {
+        $product->setReviewsCount($dataArray['aggregateRating']['reviewCount']);
+        $product->setPrice($dataArray['offers']['price']);
+        $product->setUpdatedDateValue();
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
     }
 
     public function isProductJustExistInTable($productData) :bool

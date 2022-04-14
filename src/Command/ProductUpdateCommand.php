@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Product;
+use App\Controller\ParserServiceController;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -40,6 +41,11 @@ class ProductUpdateCommand extends Command
         //$io = new SymfonyStyle($input, $output);
         $repository = $this->entityManager->getRepository(Product::class);
         $dbData = $repository->findAll();//получил данные из базы данных
+
+        foreach ($dbData as $productData) {
+            $service = new ParserServiceController($this->entityManager);
+            $service -> updateProduct($productData);
+        }
         return Command::SUCCESS;
     }
 }

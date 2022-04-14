@@ -31,7 +31,7 @@ class ProductCrudController extends AbstractCrudController
             'price',
             UrlField::new('ozonLink'),
             UrlField::new('productLink'),
-            'reviews_count',
+            //'reviews_count',
 
         ];
     }
