@@ -39,9 +39,10 @@ class ParserServiceController extends AbstractController
             $response = $client->request('get', $url);
         }
         $response = $response->getBody()->getContents();
-        $crawler = new Crawler($response);
-        $test = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]')->outerHtml();
-        $encodeData = stristr($test, '{"items');
+        $crawler = new Crawler($response); //state-searchResultsV2-311178-default-1
+        $jsonData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]')->outerHtml();
+        //$test = $crawler->filterXPath('//*[@id="state-searchResultsV2-311178-default-1"]')->outerHtml();
+        $encodeData = stristr($jsonData, '{"items');
         $encodeData = stristr($encodeData, '\'></div>', true);
         $encodeData = json_decode($encodeData, true);
         $goodsData =[];
@@ -51,7 +52,7 @@ class ParserServiceController extends AbstractController
         foreach ($encodeData['items'] as $itemData) {
             if(isset($itemData['multiButton']['ozonSubtitle']) ) { //&& isset($itemData['mainState'][3]['atom']['rating']['count'])
                 ++$collectDataCount;
-                //dd($encodeData['items'][2]);
+                dd($encodeData['items']);
                 $goodData = [
                     'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
                     'productName' => $this->getProductName($itemData['mainState']),
