@@ -23,103 +23,69 @@ class ParserServiceController extends AbstractController
             'controller_name' => 'ParserServiceController',
         ]);
     }*/
-    private $em;
+    private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager) {
 //        $this->twig = $twig;
-        $this->em = $entityManager;
+        $this->entityManager = $entityManager;
     }
 
     public function getGoods($url) {
         //$entityManager = $doctrine->getManager();
         $client = new Client();
-        $resp = $client->request('get', $url)->getBody()->getContents();
-        $crawler = new Crawler($resp);
+        $response = $client->request('get', $url);
+        while($response->getStatusCode() !== 200) {
+            $response = $client->request('get', $url);
+        }
+        $response = $response->getBody()->getContents();
+        $crawler = new Crawler($response);
         $test = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]')->outerHtml();
         $encodeData = stristr($test, '{"items');
         $encodeData = stristr($encodeData, '\'></div>', true);
         $encodeData = json_decode($encodeData, true);
-        $goodData = [
-            'seller' => $this->getSeller(strip_tags($encodeData['items'][2]['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
-            'productName' => $encodeData['items'][2]['mainState'][2]['atom']['textAtom']['text'],
-            'price' => $encodeData['items'][2]['mainState'][0]['atom']['price']['price'],
-            'countOfReviews' => $encodeData['items'][2]['mainState'][3]['atom']['rating']['count'],
-            'sku' => $encodeData['items'][2]['topRightButtons'][0]['favoriteProductMolecule']['sku'],
-        ];
-        $seller = new Seller();
-        $seller->setName($goodData['seller']);
-        $this->em->persist($seller);
+        $goodsData =[];
+        foreach ($encodeData['items'] as $itemData) {
+            if(isset($itemData['multiButton']['ozonSubtitle'])) {
+                $goodData = [
+                    'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
+                    'productName' => $this->getProductName($itemData['mainState']),
+                    'price' => $this->getPrise($itemData['mainState'][0]['atom']['price']['price']),
+                    'countOfReviews' => $this->getCountOfReview($itemData['mainState']),
+                    'sku' => $itemData['topRightButtons'][0]['favoriteProductMolecule']['sku'],
+                ];
+                array_push($goodsData, $goodData);
+            }
 
-        // действительно выполните запросы (например, запрос INSERT)
-        $this->em->flush();
-        $product = new Product($seller);
-        $product->setName($goodData['productName']);
-        $product->setPrice(123);
-        $product->setSku($goodData['sku']);
-        $product->setReviewsCount(1234);
-        $product->setCreatedDateValue();
-        $product->setUpdatedDateValue();
-        $product->setSellerId($seller);
-        $this->em->persist($product);
+        }
+        $this->addProductDataToDB($goodsData);
 
-        // действительно выполните запросы (например, запрос INSERT)
-        $this->em->flush();
-        return $goodData;
-        //var_dump($encodeData['items']);
-        //$productData = [];
-       // $productCount = count($encodeData['items']);
-        /*for ($i = 0; $i < $productCount; ++$i) {
-            //dd($itemData);
-            //dd($encodeData['items'][$i]);
-            echo $encodeData['items'][$i]['topRightButtons'][0]['favoriteProductMolecule']['sku']; //sku
-            echo $encodeData['items'][$i]['mainState'][3]['atom']['rating']['count']; //reviews
-            echo $encodeData['items'][$i]['mainState'][2]['atom']['textAtom']['text']; //name
-            echo $encodeData['items'][$i]['mainState'][0]['atom']['price']['price']; //цена
-            echo $this->getSeller(strip_tags($encodeData['items'][$i]['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])); //seller
-            /*$goodData = [
-                'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
-                'productName' => $itemData['mainState'][2]['atom']['textAtom']['text'],
-                'price' => $itemData['mainState'][0]['atom']['price']['price'],
-                'countOfReviews' => $itemData['mainState'][3]['atom']['rating']['count'],
-                'sku' => $itemData['topRightButtons'][0]['favoriteProductMolecule']['sku'],
-            ];
-            //array_push($productData, $goodData);
-            echo "___($i)__";
-        }*/
-        //dd($productData);
-        /*$client = new Client();
-
-        $crawler = new Crawler();
-        $crawler -> addHtmlContent(file_get_contents($url));
-        //echo $crawler->html();
-        $goodsArray =[];
-        $converter = new CssSelectorConverter();
-        //$product = $crawler->filter('.n4i');
-        //$product = $crawler->filter('.widget-search-result-container >div > div');
-        $product = $crawler->filterXPath('//*[@id="layoutPage"]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div/div/div');
-        //echo $product->count();
-        //$links = $crawler->filter('.widget-search-result-container >div > div > .im7')->extract(['attr' => 'href']); // сделать зависимым не от тега
-        $links = $crawler->filterXPath('//*[@id="layoutPage"]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div/div/div/a')->extract(['attr' => 'href']); // сделать зависимым не от тега
-
-        //var_dump($links);
-        //$prices = $crawler->filter('.ui-t');
-        $i = 0;
-        foreach ($product as $key => $domElement) {
-
-            //echo $this->getProductName($domElement->textContent).' ';
-            //echo $domElement->textContent.'____';
-            //array_push($goodsArray, $domElement->textContent);
-            //var_dump($domElement);
-            //var_dump($domElement);
-            /*foreach($domElement->childNodes as $node) {
-                $html .= $domElement->ownerDocument->saveHTML($node);
-                $html .='\n';
-            }*/
     }
         //file_put_contents('2.txt', $html);
         //echo $html;
         //return $goodsArray;
 
+    public function addProductDataToDB(array $productsArray) {
+        foreach ($productsArray as $productData) {
+            $seller = new Seller();
+            $seller->setName($productData['seller']);
+            $this->entityManager->persist($seller);
+
+            // действительно выполните запросы (например, запрос INSERT)
+            $this->entityManager->flush();
+            $product = new Product($seller);
+            $product->setName($productData['productName']);
+            $product->setPrice($productData['price']);
+            $product->setSku($productData['sku']);
+            $product->setReviewsCount($productData['countOfReviews']);
+            $product->setCreatedDateValue();
+            $product->setUpdatedDateValue();
+            $product->setSellerId($seller);
+            $this->entityManager->persist($product);
+
+            // действительно выполните запросы (например, запрос INSERT)
+            $this->entityManager->flush();
+        }
+    }
 
     public function getSeller($string) :?string
     {
@@ -131,42 +97,32 @@ class ParserServiceController extends AbstractController
     public function getPrise($string) :?int
     {
         $matches=[];
-        $string = str_replace(' ','  ',$string);
-        if(preg_match_all('/[\d]*\s\s[\d]{3}\s\s/', $string, $matches)===0)
+        $string = str_replace(' ',' ',$string);
+        if(preg_match_all('/[\d]*\s?[\d]{0,3}/', $string, $matches)===0)
             return null;
         $price =str_replace(' ','',$matches[0][0]);
         return intval($price);
     }
 
-    public function getCountOfReview($string) :?int
+    public function getCountOfReview($dataArray) :?int
     {
-        $finishIndex = mb_strpos($string, 'отз')-2;
-        $string=mb_substr($string,0,$finishIndex+1);
+        if(!isset($dataArray[3]['atom']['rating']['count']))
+            return 0;
+        $string=$dataArray[3]['atom']['rating']['count'];
         $matches = [];
-        if(preg_match('/\d+$/',$string,$matches) === 0)
+        if(preg_match('/\d*/',$string,$matches) === 0)
             return null;
-        //var_dump($matches);
         return intval($matches[0]);
     }
 
-    public function getProductName($string) :?string
+    public function getProductName($dataArray) :?string
     {
-        $countOfReview = $this->getCountOfReview($string);
-
-        $string = str_replace('Бестселлер','', $string); //Убираем слово бестселлер
-        $finishLineIndex = mb_strpos($string, 'отз') - 2;
-        $string = mb_substr($string, 0, $finishLineIndex + 1);
-
-        $startIndex = mb_strpos($string, '₽'); //обрезаем строку оставляя только название и количество отзывов
-        $string = mb_substr($string, $startIndex + 1);
-        $startIndex = mb_strpos($string, '₽');
-        $string = mb_substr($string, $startIndex + 1);
-
-        $finishLineIndex = mb_strpos($string,strval($countOfReview));
-        $string = mb_substr($string, 0, $finishLineIndex -1);
-        //echo $startIndex;
-        return $string;
-
+        foreach ($dataArray as $atomArray) {
+            if($atomArray['id'] === 'name'){
+                return $atomArray['atom']['textAtom']['text'];
+            }
+        }
+        return null;
     }
 
     public function getSKU($link) :?int

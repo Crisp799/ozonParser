@@ -24,11 +24,11 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
 class ParserController extends AbstractDashboardController
 {
     //private $twig;
-    private $em;
+    private $entityManager;
 
-    public function __construct( EntityManagerInterface $em) {
+    public function __construct( EntityManagerInterface $entityManager) {
 //        $this->twig = $twig;
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/', name: 'home')]
@@ -67,7 +67,7 @@ class ParserController extends AbstractDashboardController
         if ($form->isSubmitted()) {
             $formData = $form->getData();
             //$this->getGoods($formData['query']);
-            $controller = new ParserServiceController($this->em);
+            $controller = new ParserServiceController($this->entityManager);
             $controller->getGoods($formData['query']);
 
             //cho $formData['query'];
