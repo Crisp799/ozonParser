@@ -66,25 +66,91 @@ class ParserServiceController extends AbstractController
 
     public function addProductDataToDB(array $productsArray) {
         foreach ($productsArray as $productData) {
+            //dd($productData);
             $seller = new Seller();
-            $seller->setName($productData['seller']);
-            $this->entityManager->persist($seller);
+            $seller = $this->isSellerJustExistInTable($productData['seller']);
+            if($seller === null) {
+                $seller = new Seller();
+                $seller->setName($productData['seller']);
+                $this->entityManager->persist($seller);
+                // действительно выполните запросы (например, запрос INSERT)
+                $this->entityManager->flush();
+            }
+            if($this->isProductJustExistInTable($productData) === false){
+                $product = new Product($seller);
+                $product->setName($productData['productName']);
+                $product->setPrice($productData['price']);
+                $product->setSku($productData['sku']);
+                $product->setReviewsCount($productData['countOfReviews']);
+                $product->setCreatedDateValue();
+                $product->setUpdatedDateValue();
+                $product->setSellerId($seller);
+                $this->entityManager->persist($product);
 
-            // действительно выполните запросы (например, запрос INSERT)
-            $this->entityManager->flush();
-            $product = new Product($seller);
-            $product->setName($productData['productName']);
-            $product->setPrice($productData['price']);
-            $product->setSku($productData['sku']);
-            $product->setReviewsCount($productData['countOfReviews']);
-            $product->setCreatedDateValue();
-            $product->setUpdatedDateValue();
-            $product->setSellerId($seller);
-            $this->entityManager->persist($product);
+                // действительно выполните запросы (например, запрос INSERT)
+                $this->entityManager->flush();
+            }
+                    /*
+                $repository = $this->entityManager->getRepository(Seller::class);
+                $dbData = $repository->findAll();
+                $seller = new Seller();
+                foreach ($dbData as $sellerData) {
+                    if($productData['seller'] === $sellerData->getName())
+                        $seller = $sellerData;
+                }*/
+                //$seller = new Seller();
+                //$seller->setName($productData['seller']);
+                //$this->entityManager->persist($seller);
 
-            // действительно выполните запросы (например, запрос INSERT)
-            $this->entityManager->flush();
+                // действительно выполните запросы (например, запрос INSERT)
+                /*$this->entityManager->flush();
+                $product = new Product($seller);
+                $product->setName($productData['productName']);
+                $product->setPrice($productData['price']);
+                $product->setSku($productData['sku']);
+                $product->setReviewsCount($productData['countOfReviews']);
+                $product->setCreatedDateValue();
+                $product->setUpdatedDateValue();
+                $product->setSellerId($seller);
+                //$this->entityManager->persist($product);
+
+                // действительно выполните запросы (например, запрос INSERT)
+                //$this->entityManager->flush();*/
         }
+    }
+
+    public function isProductJustExistInTable($productData) :bool
+    {
+        //dd($productData);
+        $skuString = $productData['sku'];
+        $repository = $this->entityManager->getRepository(Product::class);
+        $dbData = $repository->findAll();
+        //$seller = new Seller();
+        foreach ($dbData as $productDBData) {
+            if($skuString == $productDBData->getSku()) {
+                //echo $productDBData->getSku();
+                $productDBData->setUpdatedDateValue();
+                $productDBData->setReviewsCount($productData['countOfReviews']);
+                $productDBData->setPrice($productData['price']);
+                $this->entityManager->persist($productDBData);
+                $this->entityManager->flush();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isSellerJustExistInTable(string $string) :?Seller
+    {
+        $repository = $this->entityManager->getRepository(Seller::class);
+        $dbData = $repository->findAll();
+        //$seller = new Seller();
+        foreach ($dbData as $sellerData) {
+            if($string === $sellerData->getName())
+                return $sellerData;
+        }
+
+        return null;
     }
 
     public function getSeller($string) :?string
