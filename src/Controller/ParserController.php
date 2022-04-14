@@ -63,17 +63,17 @@ class ParserController extends AbstractDashboardController
         $form = $this->createForm(SearchFormType::class);
         $form->handleRequest($request);
 
-        $goodsArray=[];
+        $responseInfo = [];
         if ($form->isSubmitted()) {
             $formData = $form->getData();
             //$this->getGoods($formData['query']);
-            $controller = new ParserServiceController($this->entityManager);
-            $controller->getGoods($formData['query']);
+            $parserService = new ParserServiceController($this->entityManager);
+            $responseInfo = $parserService->collect($formData['query']);
 
             //cho $formData['query'];
         }
         //return $this->redirect($url);
-        return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'goods' => $goodsArray]);
+        return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo]);
     }
 /*
     public function  getHTML($url = '') {

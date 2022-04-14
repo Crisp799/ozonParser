@@ -30,7 +30,8 @@ class ParserServiceController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    public function getGoods($url) {
+    public function collect($url) :array
+    {
         //$entityManager = $doctrine->getManager();
         $client = new Client();
         $response = $client->request('get', $url);
@@ -44,8 +45,12 @@ class ParserServiceController extends AbstractController
         $encodeData = stristr($encodeData, '\'></div>', true);
         $encodeData = json_decode($encodeData, true);
         $goodsData =[];
+
+        $collectDataCount = 0;
+
         foreach ($encodeData['items'] as $itemData) {
             if(isset($itemData['multiButton']['ozonSubtitle'])) {
+                ++$collectDataCount;
                 $goodData = [
                     'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
                     'productName' => $this->getProductName($itemData['mainState']),
@@ -55,16 +60,22 @@ class ParserServiceController extends AbstractController
                 ];
                 array_push($goodsData, $goodData);
             }
-
         }
-        $this->addProductDataToDB($goodsData);
+        $addDataCount = $this->saveProduct($goodsData);
+
+        return [
+            'collectDataCount' => $collectDataCount,
+            'addDataCount' => $addDataCount,
+            ];
 
     }
         //file_put_contents('2.txt', $html);
         //echo $html;
         //return $goodsArray;
 
-    public function addProductDataToDB(array $productsArray) {
+    private function saveProduct(array $productsArray) :int
+    {
+        $addDataCount = 0;
         foreach ($productsArray as $productData) {
             //dd($productData);
             $seller = new Seller();
@@ -89,34 +100,11 @@ class ParserServiceController extends AbstractController
 
                 // действительно выполните запросы (например, запрос INSERT)
                 $this->entityManager->flush();
+                ++$addDataCount;
             }
-                    /*
-                $repository = $this->entityManager->getRepository(Seller::class);
-                $dbData = $repository->findAll();
-                $seller = new Seller();
-                foreach ($dbData as $sellerData) {
-                    if($productData['seller'] === $sellerData->getName())
-                        $seller = $sellerData;
-                }*/
-                //$seller = new Seller();
-                //$seller->setName($productData['seller']);
-                //$this->entityManager->persist($seller);
 
-                // действительно выполните запросы (например, запрос INSERT)
-                /*$this->entityManager->flush();
-                $product = new Product($seller);
-                $product->setName($productData['productName']);
-                $product->setPrice($productData['price']);
-                $product->setSku($productData['sku']);
-                $product->setReviewsCount($productData['countOfReviews']);
-                $product->setCreatedDateValue();
-                $product->setUpdatedDateValue();
-                $product->setSellerId($seller);
-                //$this->entityManager->persist($product);
-
-                // действительно выполните запросы (например, запрос INSERT)
-                //$this->entityManager->flush();*/
         }
+        return $addDataCount;
     }
 
     public function isProductJustExistInTable($productData) :bool
