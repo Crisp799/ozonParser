@@ -49,8 +49,9 @@ class ParserServiceController extends AbstractController
         $collectDataCount = 0;
 
         foreach ($encodeData['items'] as $itemData) {
-            if(isset($itemData['multiButton']['ozonSubtitle'])) {
+            if(isset($itemData['multiButton']['ozonSubtitle']) ) { //&& isset($itemData['mainState'][3]['atom']['rating']['count'])
                 ++$collectDataCount;
+                //dd($encodeData['items'][2]);
                 $goodData = [
                     'seller' => $this->getSeller(strip_tags($itemData['multiButton']['ozonSubtitle']['textAtomWithIcon']['text'])),
                     'productName' => $this->getProductName($itemData['mainState']),
@@ -118,7 +119,8 @@ class ParserServiceController extends AbstractController
             if($skuString == $productDBData->getSku()) {
                 //echo $productDBData->getSku();
                 $productDBData->setUpdatedDateValue();
-                $productDBData->setReviewsCount($productData['countOfReviews']);
+                if($productData['countOfReviews'] < $productDBData->getReviewsCount())
+                    $productDBData->setReviewsCount($productData['countOfReviews']);
                 $productDBData->setPrice($productData['price']);
                 $this->entityManager->persist($productDBData);
                 $this->entityManager->flush();
@@ -160,13 +162,21 @@ class ParserServiceController extends AbstractController
 
     public function getCountOfReview($dataArray) :?int
     {
-        if(!isset($dataArray[3]['atom']['rating']['count']))
+        //dd($dataArray);
+        /*if(!isset($dataArray[3]['atom']['rating']['count'])) {
+            dd($dataArray);
             return 0;
-        $string=$dataArray[3]['atom']['rating']['count'];
-        $matches = [];
-        if(preg_match('/\d*/',$string,$matches) === 0)
-            return null;
-        return intval($matches[0]);
+        }*/
+        foreach ($dataArray as $data) {
+            if($data['atom']['type'] === 'rating') {
+                $string = $data['atom']['rating']['count'];
+                $matches = [];
+                if(preg_match('/\d*/',$string,$matches) === 0)
+                    return null;
+                return intval($matches[0]);
+            }
+        }
+        return 0;
     }
 
     public function getProductName($dataArray) :?string

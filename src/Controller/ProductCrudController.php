@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
@@ -28,7 +29,9 @@ class ProductCrudController extends AbstractCrudController
             'id',
             'name',
             'price',
-            TextField::new('ozonLink'),
+            UrlField::new('ozonLink'),
+            UrlField::new('productLink'),
+            'reviews_count',
 
         ];
     }

@@ -57,6 +57,8 @@ class Product
 
     private $ozonLink;
 
+    private $productLink;
+
     public function  __construct(Seller $productSeller)
     {
         $seller = $productSeller->getId();
@@ -176,6 +178,11 @@ class Product
     public function  getOzonLink() : string
     {
         return 'https://www.ozon.ru/product/'.$this->getSku();
+    }
+
+    public function getProductLink() : string
+    {
+        return '/product/'.$this->getId();
     }
 
 }
