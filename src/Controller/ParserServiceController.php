@@ -159,14 +159,25 @@ class ParserServiceController extends AbstractController
     public function isSellerJustExistInTable(string $string) :?Seller
     {
         $repository = $this->entityManager->getRepository(Seller::class);
-        $dbData = $repository->findAll();
-        //$seller = new Seller();
+        $dbData = $repository->findOneBy(['name' => $string]);
+        if(!empty($dbData))
+            return $dbData;
+        /*$dbData = $repository->findAll();
         foreach ($dbData as $sellerData) {
             if($string === $sellerData->getName())
                 return $sellerData;
-        }
+        }*/
 
         return null;
+    }
+
+    public function isSellerExistInTable(int $id) : bool
+    {
+        $repository = $this->entityManager->getRepository(Seller::class);
+        $dbData = $repository->findOneBy(['id' => $id]);
+        if(empty($dbData))
+            return false;
+        return true;
     }
 
     public function getSeller($string) :?string
