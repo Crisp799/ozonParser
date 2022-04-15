@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Validator;
 use App\Entity\Product;
 use App\Form\SearchFormType;
 use Doctrine\ORM\EntityManager;
@@ -63,17 +64,26 @@ class ParserController extends AbstractDashboardController
         $form = $this->createForm(SearchFormType::class);
         $form->handleRequest($request);
 
-        $responseInfo = [];
+        $responseInfo = [
+            'collectDataCount' => 0,
+            'addDataCount' => 0,
+            ];
+
         if ($form->isSubmitted()) {
             $formData = $form->getData();
             //$this->getGoods($formData['query']);
+            $validator = new Validator();
+            $errors = $validator->ValidateUrl($formData['query']);
+            if (count($errors) != 0)
+                return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo, 'errors' => $errors]);
             $parserService = new ParserServiceController($this->entityManager);
             $responseInfo = $parserService->collect($formData['query']);
 
             //cho $formData['query'];
         }
+        $errors = null;
         //return $this->redirect($url);
-        return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo]);
+        return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo, 'errors' => $errors]);
     }
 
 
