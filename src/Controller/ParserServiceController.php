@@ -62,7 +62,7 @@ class ParserServiceController extends AbstractController
 
         $allData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]');
 
-        $jsonData = $allData->outerHtml(); //  может начать ругаться на outerHtml() и выкидывать ошибку, для решения надо перезагрузить страницу
+        $jsonData = $allData->outerHtml(); //  может начать ругаться на outerHtml() и выкидывать ошибку, для решения необходимо перезагрузить страницу
                                            //  решить эту проблему без изменения класса crawler так и не получилось
                                            //  из-за этого, чтобы уменьшить вероятность появление ошибки, количество страниц было ограничено
 
