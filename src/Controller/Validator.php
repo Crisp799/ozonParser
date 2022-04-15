@@ -31,6 +31,8 @@ class Validator
         if (isset($matched[5]) && strlen($matched[5]) > 0) {
             if (!isset($matched[6]) || strlen($matched[6]) === 0)
                 array_push($this->errors, 'Missing your-page-number');
+            if (isset($matched[6]) && $matched[6]<1)
+                array_push($this->errors, 'Invaled your-page-number');
         }
         //var_dump($matches);
         return $this->errors;
