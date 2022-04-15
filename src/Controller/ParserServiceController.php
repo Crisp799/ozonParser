@@ -33,16 +33,16 @@ class ParserServiceController extends AbstractController
             'collectDataCount' => 0,
             'addDataCount' => 0,
         ];
-        $defoultPageUrl = '';
+        $defaultPageUrl = '';
         for ($i = 1; $i < 5; ++$i)
-            $defoultPageUrl .= $parsedUrl[$i];
-        $customPageUrl = $defoultPageUrl . '?page=';
+            $defaultPageUrl .= $parsedUrl[$i];
+        $customPageUrl = $defaultPageUrl . '?page=';
         $startPageIndex = isset($parsedUrl[6]) ? $parsedUrl[6] : 1;
 
         for ($i = 0; $i < $pageCount; ++$i) {
             $iterResultInfo = [];
-            if ($i === 0 && $startPageIndex === 1) {
-                $iterResultInfo = $this->pageParser($defoultPageUrl);
+            if ($i === 0 && $startPageIndex == 1) {
+                $iterResultInfo = $this->pageParser($defaultPageUrl);
             } else
                 $iterResultInfo = $this->pageParser($customPageUrl . $startPageIndex + $i);
 
