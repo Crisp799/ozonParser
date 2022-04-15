@@ -6,9 +6,9 @@ use GuzzleHttp\Client;
 
 class Validator
 {
-    private $errors=[];
+    private $errors = [];
 
-    public function ValidateUrl(array $matched) :array
+    public function ValidateUrl(array $matched): array
     {
         $client = new Client();
         $url = $matched[0];
@@ -25,10 +25,10 @@ class Validator
             return $this->errors;
         }
         if (!isset($matched[4]) || strlen($matched[4]) === 0)
-            array_push($this -> errors, "Missing your-category-name");
-        if(isset($matched[5]) && strlen($matched[5]) > 0) {
-            if(!isset($matched[6]) || strlen($matched[6]) === 0)
-                array_push($this -> errors, 'Missing your-page-number');
+            array_push($this->errors, "Missing your-category-name");
+        if (isset($matched[5]) && strlen($matched[5]) > 0) {
+            if (!isset($matched[6]) || strlen($matched[6]) === 0)
+                array_push($this->errors, 'Missing your-page-number');
         }
         //var_dump($matches);
         return $this->errors;

@@ -16,7 +16,8 @@ class ProductController extends AbstractDashboardController
 {
     private $entityManager;
 
-    public function __construct( EntityManagerInterface $entityManager) {
+    public function __construct(EntityManagerInterface $entityManager)
+    {
         $this->entityManager = $entityManager;
     }
 
@@ -33,14 +34,14 @@ class ProductController extends AbstractDashboardController
     public function product(int $id = 0): Response
     {
         $productRepository = $this->entityManager->getRepository(Product::class);
-        $productData = $productRepository->findOneBy(['id'=>$id]);
+        $productData = $productRepository->findOneBy(['id' => $id]);
         $sellerRepository = $this->entityManager->getRepository(Seller::class);
-        $seller = $sellerRepository->findOneBy(['id'=>$productData->getSellerId()]);
-        $param =[
+        $seller = $sellerRepository->findOneBy(['id' => $productData->getSellerId()]);
+        $param = [
             'id' => $productData->getId(),
             'name' => $productData->getName(),
             'price' => $productData->getPrice(),
-            'seller' => $sellerRepository->findOneBy(['id'=>$productData->getSellerId()])->getName(),
+            'seller' => $sellerRepository->findOneBy(['id' => $productData->getSellerId()])->getName(),
             'countOfReviews' => $productData->getReviewsCount(),
             'createDate' => $productData->getCreatedDate()->format('Y-m-d H:i:s'),
             'updated_date' => $productData->getUpdatedDate()->format('Y-m-d H:i:s'),

@@ -2,16 +2,15 @@
 
 namespace App\Command;
 
-use App\Entity\Product;
+
 use App\Controller\ParserServiceController;
+use App\Entity\Product;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Doctrine\ORM\EntityManagerInterface;
 
 #[AsCommand(
     name: 'ProductUpdateCommand',
@@ -31,8 +30,7 @@ class ProductUpdateCommand extends Command
     {
         $this
             ->setDescription('Command for update')
-            ->addArgument('sellerID', InputArgument::OPTIONAL, 'The Seller ID')
-        ;
+            ->addArgument('sellerID', InputArgument::OPTIONAL, 'The Seller ID');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -40,11 +38,11 @@ class ProductUpdateCommand extends Command
         $id = $input->getArgument('sellerID');
         $service = new ParserServiceController($this->entityManager);
         $repository = $this->entityManager->getRepository(Product::class);
-        if(empty($id))
+        if (empty($id)) {
             $dbData = $repository->findAll();//получил данные из базы данных
-        else if($service->isSellerExistInTable($id) === true)
+        } else if ($service->isSellerExistInTable($id) === true) {
             $dbData = $repository->findBy(['seller' => $id]);
-        else {
+        } else {
             $output->writeln('Продавец с указанным ID не найден');
             return Command::FAILURE;
         }
@@ -53,7 +51,7 @@ class ProductUpdateCommand extends Command
 
         foreach ($dbData as $productData) {
 
-            $service -> updateProduct($productData);
+            $service->updateProduct($productData);
             ++$count;
         }
         $output->writeln("$count updated");

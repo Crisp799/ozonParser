@@ -59,14 +59,14 @@ class Product
 
     private $productLink;
 
-    public function  __construct(Seller $productSeller)
+    public function __construct(Seller $productSeller)
     {
         $seller = $productSeller->getId();
     }
 
     public function __toString(): string
     {
-        return $this->name.' '.$this->price;
+        return $this->name . ' ' . $this->price;
     }
 
     public function getId(): ?int
@@ -175,14 +175,14 @@ class Product
         return $this;
     }
 
-    public function  getOzonLink() : string
+    public function getOzonLink(): string
     {
-        return 'https://www.ozon.ru/product/'.$this->getSku();
+        return 'https://www.ozon.ru/product/' . $this->getSku();
     }
 
-    public function getProductLink() : string
+    public function getProductLink(): string
     {
-        return '/product/'.$this->getId();
+        return '/product/' . $this->getId();
     }
 
 }

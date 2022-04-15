@@ -81,7 +81,9 @@ class Seller
     {
         return $this->products;
     }
-    public function getCountOfProducts() {
+
+    public function getCountOfProducts()
+    {
         return count($this->products);
     }
 }
