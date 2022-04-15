@@ -2,26 +2,17 @@
 
 namespace App\Controller;
 
-use App\Controller\Validator;
-use App\Entity\Product;
+
 use App\Entity\Seller;
 use App\Form\SearchFormType;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use GuzzleHttp\Handler;
-use GuzzleHttp\Client;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Twig\Environment;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class ParserController extends AbstractDashboardController
 {
@@ -35,23 +26,11 @@ class ParserController extends AbstractDashboardController
     public function index(): Response
     {
         return $this->redirect('/parser');
-        //return $this->render('bundles/EasyAdminBundle/layout.html.twig', ['form' => $form->createView()]);
-
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator->setController(OneOfYourCrudController::class)->generateUrl());
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirect('...');
-        // }
-
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        //return $this->render('Parser/parserUrl.html.twig');
+    }
+    #[Route('/admin', name: 'admin')]
+    public function showAdminPage(): Response
+    {
+        return $this->redirect('/parser');
     }
 
     #[Route('/parser', name: 'parser')]
@@ -70,7 +49,6 @@ class ParserController extends AbstractDashboardController
 
         if ($form->isSubmitted()) {
             $formData = $form->getData();
-            //$this->getGoods($formData['query']);
             $validator = new Validator();
             $errors = $validator->ValidateUrl($formData['query']);
             if (count($errors) > 0)
@@ -78,10 +56,8 @@ class ParserController extends AbstractDashboardController
             $parserService = new ParserServiceController($this->entityManager);
             $responseInfo = $parserService->collect($formData['query']);
 
-            //cho $formData['query'];
         }
         $errors = null;
-        //return $this->redirect($url);
         return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo, 'errors' => $errors]);
     }
 
@@ -101,9 +77,6 @@ class ParserController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
-        //yield MenuItem::section('PARSER','fas fa-comments' );
         yield MenuItem::linkToRoute('Parser', 'fas fa-comments', 'parser');
         yield MenuItem::linkToRoute('Products', 'fas fa-home', 'products');
         yield MenuItem::linkToCrud('Sellers', 'fas fa-home', Seller::class);

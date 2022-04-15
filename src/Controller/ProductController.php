@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Entity\Seller;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -59,9 +58,6 @@ class ProductController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
-        //yield MenuItem::section('PARSER','fas fa-comments' );
         yield MenuItem::linkToRoute('Back to parser', 'fas fa-home', 'parser');
         yield MenuItem::linkToRoute('Product', 'fas fa-comments', 'products');
         yield MenuItem::linkToCrud('Sellers', 'fas fa-home', Seller::class);

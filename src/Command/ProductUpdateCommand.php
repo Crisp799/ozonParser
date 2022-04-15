@@ -32,14 +32,11 @@ class ProductUpdateCommand extends Command
         $this
             ->setDescription('Command for update')
             ->addArgument('sellerID', InputArgument::OPTIONAL, 'The Seller ID')
-            //->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            //->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$io = new SymfonyStyle($input, $output);
         $id = $input->getArgument('sellerID');
         $service = new ParserServiceController($this->entityManager);
         $repository = $this->entityManager->getRepository(Product::class);

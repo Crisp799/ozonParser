@@ -4,45 +4,30 @@ namespace App\Controller;
 
 use App\Entity\Seller;
 use App\Entity\Product;
-use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\CssSelector\CssSelectorConverter;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ParserServiceController extends AbstractController
 {
-    /*
-    #[Route('/parser/service', name: 'app_parser_service')]
-    public function index(): Response
-    {
-        return $this->render('parser_service/index.html.twig', [
-            'controller_name' => 'ParserServiceController',
-        ]);
-    }*/
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager) {
-//        $this->twig = $twig;
         $this->entityManager = $entityManager;
     }
 
     public function collect($url) :array
     {
-        //$entityManager = $doctrine->getManager();
         $client = new Client();
         $response = $client->request('get', $url);
         $response = $response->getBody()->getContents();
         $crawler = new Crawler($response);
 
         $allData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]');
-        //var_dump($allData);
+
         $jsonData = $allData->outerHtml(); //  может начать ругаться на outerHtml() для решения надо перезагрузить страницу
-        //$jsonData = $this->outerHtml($allData);
-        //$test = $crawler->filterXPath('//*[@id="state-searchResultsV2-311178-default-1"]')->outerHtml();
+
 
         $encodeData = stristr($jsonData, '{"items');
         $encodeData = stristr($encodeData, '\'></div>', true);
@@ -77,14 +62,13 @@ class ParserServiceController extends AbstractController
     {
         $addDataCount = 0;
         foreach ($productsArray as $productData) {
-            //dd($productData);
-            $seller = new Seller();
+
             $seller = $this->isSellerJustExistInTable($productData['seller']);
             if($seller === null) {
                 $seller = new Seller();
                 $seller->setName($productData['seller']);
                 $this->entityManager->persist($seller);
-                // действительно выполните запросы (например, запрос INSERT)
+
                 $this->entityManager->flush();
             }
             if($this->isProductJustExistInTable($productData) === false){
@@ -98,7 +82,6 @@ class ParserServiceController extends AbstractController
                 $product->setSellerId($seller);
                 $this->entityManager->persist($product);
 
-                // действительно выполните запросы (например, запрос INSERT)
                 $this->entityManager->flush();
                 ++$addDataCount;
             }
@@ -116,7 +99,6 @@ class ParserServiceController extends AbstractController
         }
         $response = $response->getBody()->getContents();
         $crawler = new Crawler($response); //state-searchResultsV2-311178-default-1
-        //var_dump($crawler);
         $jsonData = $crawler->filterXPath('//script[@type="application/ld+json"]')->outerHtml();
         $matches =[];
         preg_match('/{.+}/', $jsonData, $matches);
@@ -136,24 +118,12 @@ class ParserServiceController extends AbstractController
 
     public function isProductJustExistInTable($productData) :bool
     {
-        //dd($productData);
         $skuString = $productData['sku'];
         $repository = $this->entityManager->getRepository(Product::class);
-        $dbData = $repository->findAll();
-        //$seller = new Seller();
-        foreach ($dbData as $productDBData) {
-            if($skuString == $productDBData->getSku()) {
-                //echo $productDBData->getSku();
-                $productDBData->setUpdatedDateValue();
-                if($productData['countOfReviews'] < $productDBData->getReviewsCount())
-                    $productDBData->setReviewsCount($productData['countOfReviews']);
-                $productDBData->setPrice($productData['price']);
-                $this->entityManager->persist($productDBData);
-                $this->entityManager->flush();
-                return true;
-            }
-        }
-        return false;
+        $dbData = $repository->findOneBy(['sku' => $skuString]);
+        if(empty($dbData))
+            return false;
+        return true;
     }
 
     public function isSellerJustExistInTable(string $string) :?Seller
@@ -162,11 +132,6 @@ class ParserServiceController extends AbstractController
         $dbData = $repository->findOneBy(['name' => $string]);
         if(!empty($dbData))
             return $dbData;
-        /*$dbData = $repository->findAll();
-        foreach ($dbData as $sellerData) {
-            if($string === $sellerData->getName())
-                return $sellerData;
-        }*/
 
         return null;
     }
@@ -199,11 +164,6 @@ class ParserServiceController extends AbstractController
 
     public function getCountOfReview($dataArray) :?int
     {
-        //dd($dataArray);
-        /*if(!isset($dataArray[3]['atom']['rating']['count'])) {
-            dd($dataArray);
-            return 0;
-        }*/
         foreach ($dataArray as $data) {
             if($data['atom']['type'] === 'rating') {
                 $string = $data['atom']['rating']['count'];
@@ -224,13 +184,5 @@ class ParserServiceController extends AbstractController
             }
         }
         return null;
-    }
-
-    public function getSKU($link) :?int
-    {
-        $matches =[];
-        if(preg_match('/\d{5,}/', $link, $matches) === false)
-            return null;
-        return intval($matches[0]);
     }
 }
