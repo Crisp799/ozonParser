@@ -63,8 +63,8 @@ class ParserServiceController extends AbstractController
         $allData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]');
 
         $jsonData = $allData->outerHtml(); //  может начать ругаться на outerHtml() и выкидывать ошибку, для решения необходимо перезагрузить страницу
-                                           //  решить эту проблему без изменения класса crawler так и не получилось
-                                           //  из-за этого, чтобы уменьшить вероятность появление ошибки, количество страниц было ограничено
+        //  решить эту проблему без изменения класса crawler так и не получилось
+        //  из-за этого, чтобы уменьшить вероятность появление ошибки, количество страниц было ограничено
 
         $encodeData = stristr($jsonData, '{"items');
         $encodeData = stristr($encodeData, '\'></div>', true);
@@ -161,6 +161,11 @@ class ParserServiceController extends AbstractController
         $dbData = $repository->findOneBy(['sku' => $skuString]);
         if (empty($dbData))
             return false;
+        $dbData->setReviewsCount($productData['countOfReviews']);
+        $dbData->setPrice($productData['price']);
+        $dbData->setUpdatedDateValue();
+        $this->entityManager->persist($dbData);
+        $this->entityManager->flush();
         return true;
     }
 
