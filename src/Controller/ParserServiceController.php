@@ -40,7 +40,8 @@ class ParserServiceController extends AbstractController
 
         $allData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]');
         //var_dump($allData);
-        $jsonData = $allData->outerHtml();
+        $jsonData = $allData->outerHtml(); //  может начать ругаться на outerHtml() для решения надо перезагрузить страницу
+        //$jsonData = $this->outerHtml($allData);
         //$test = $crawler->filterXPath('//*[@id="state-searchResultsV2-311178-default-1"]')->outerHtml();
 
         $encodeData = stristr($jsonData, '{"items');
