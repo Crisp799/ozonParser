@@ -36,9 +36,13 @@ class ParserServiceController extends AbstractController
         $client = new Client();
         $response = $client->request('get', $url);
         $response = $response->getBody()->getContents();
-        $crawler = new Crawler($response); //state-searchResultsV2-311178-default-1
-        $jsonData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]')->outerHtml();
+        $crawler = new Crawler($response);
+
+        $allData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]');
+        //var_dump($allData);
+        $jsonData = $allData->outerHtml();
         //$test = $crawler->filterXPath('//*[@id="state-searchResultsV2-311178-default-1"]')->outerHtml();
+
         $encodeData = stristr($jsonData, '{"items');
         $encodeData = stristr($encodeData, '\'></div>', true);
         $encodeData = json_decode($encodeData, true);
