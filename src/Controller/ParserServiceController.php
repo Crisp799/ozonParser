@@ -20,13 +20,14 @@ class ParserServiceController extends AbstractController
 
     public function urlParser(string $url): array
     {
-        $matches = [];
-        preg_match('/(https:\/\/)?(www.ozon.ru\/)?(category\/)?([\w-]+\/)?(\?page=)?([\d]+)?/', $url, $matches);
-        return $matches;
+        $matched = [];
+        preg_match('/(https:\/\/)?(www.ozon.ru\/)?(category\/)?([\w-]+\/)?(\?page=)?([\d]+)?/', $url, $matched);
+        return $matched;
     }
 
     public function collect(string $url, ?int $pageCount = null): array
     {
+        $pageCount = $pageCount === null ? 1 : $pageCount;
         $parsedUrl = $this->urlParser($url);
         $resultInfo = [
             'collectDataCount' => 0,

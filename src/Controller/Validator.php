@@ -8,8 +8,10 @@ class Validator
 {
     private $errors = [];
 
-    public function ValidateUrl(array $matched): array
+    public function ValidateUrl(string $url): array
     {
+        $matched = [];
+        preg_match('/(https:\/\/)?(www.ozon.ru\/)?(category\/)?([\w-]+\/)?(\?page=)?([\d]+)?/', $url, $matched);
         $client = new Client();
         $url = $matched[0];
         if (!isset($matched[2]) || strlen($matched[2]) === 0) {
