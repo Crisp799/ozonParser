@@ -3,12 +3,14 @@
 {% block main %}
 
     {{ form_start(form, {'method': 'POST'}) }}
+    <h5>Введите URL и выберете количество страниц для парсинга:</h5>
     {{ form_widget(form.query)}}
+    {{ form_widget(form.count) }}
     {{ form_widget(form.search, { 'attr': {'class': 'btn btn-primary'} }) }}
     {{ form_end(form) }}
     {% if errors != null %}
         <p>
-        <il><h3>Пожалуйста приведите url к виду: </h3></li>
+        <il><h3>Пожалуйста приведите url к виду:</h3></il>
         <il><h4>'https://www.ozon.ru/category/your-catecory-name/'</h4></il>
         <il><h4>'https://www.ozon.ru/category/your-catecory-name/?page=your-page-number'</h4></il>
         {% for error in errors %}

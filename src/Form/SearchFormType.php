@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use PHPStan\Type\IntegerType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,6 +18,13 @@ class SearchFormType extends AbstractType
             ->add('query', null, [
                 'label' => 'Your URL: ',
             ], UrlType::class)
+            ->add('count', ChoiceType::class, [
+                'choices' => [
+                    '1' => 1,
+                    '2' => 2,
+                    '3' => 3,
+                ]
+            ])
             ->add('search', SubmitType::class)
         ;
     }

@@ -51,6 +51,7 @@ class ParserController extends AbstractDashboardController
             $formData = $form->getData();
             $validator = new Validator();
             $parserService = new ParserServiceController($this->entityManager);
+            echo $formData['count'];
             $parsedURL = $parserService->urlParser($formData['query']);
             $errors = $validator->ValidateUrl($parsedURL);
             if (count($errors) > 0)
