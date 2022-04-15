@@ -17,6 +17,13 @@ class ParserServiceController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
+    public function urlParser(string $url) :array
+    {
+        $matches =[];
+        preg_match('/(https:\/\/)?(www.ozon.ru\/)?(category\/)?([\w-]+\/)?(\?page=)?([\d]+)?/', $url, $matches);
+        return $matches;
+    }
+
     public function collect($url) :array
     {
         $client = new Client();
@@ -90,7 +97,8 @@ class ParserServiceController extends AbstractController
         return $addDataCount;
     }
 
-    public function updateProduct(Product $product) {
+    public function updateProduct(Product $product)
+    {
         $url = $product->getOzonLink();
         $client = new Client();
         $response = $client->request('get', $url);

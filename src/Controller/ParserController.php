@@ -50,11 +50,13 @@ class ParserController extends AbstractDashboardController
         if ($form->isSubmitted()) {
             $formData = $form->getData();
             $validator = new Validator();
-            $errors = $validator->ValidateUrl($formData['query']);
+            $parserService = new ParserServiceController($this->entityManager);
+            $parsedURL = $parserService->urlParser($formData['query']);
+            $errors = $validator->ValidateUrl($parsedURL);
             if (count($errors) > 0)
                 return $this->render('bundles/EasyAdminBundle/page/content.html.twig', ['form' => $form->createView(), 'responseInfo' => $responseInfo, 'errors' => $errors]);
             $parserService = new ParserServiceController($this->entityManager);
-            $responseInfo = $parserService->collect($formData['query']);
+            $responseInfo = $parserService->collect($parsedURL[0]);
 
         }
         $errors = null;
