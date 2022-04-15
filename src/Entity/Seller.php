@@ -25,9 +25,17 @@ class Seller
      */
     private $name;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Product", mappedBy="seller")
+     */
+    private $products;
+
+    private $countOfProducts;
+
     public function __construct()
     {
         $this->id = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -67,5 +75,13 @@ class Seller
         }
 
         return $this;
+    }
+
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+    public function getCountOfProducts() {
+        return count($this->products);
     }
 }

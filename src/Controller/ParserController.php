@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Controller\Validator;
 use App\Entity\Product;
+use App\Entity\Seller;
 use App\Form\SearchFormType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,11 +25,9 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class ParserController extends AbstractDashboardController
 {
-    //private $twig;
     private $entityManager;
 
     public function __construct( EntityManagerInterface $entityManager) {
-//        $this->twig = $twig;
         $this->entityManager = $entityManager;
     }
 
@@ -107,5 +106,6 @@ class ParserController extends AbstractDashboardController
         //yield MenuItem::section('PARSER','fas fa-comments' );
         yield MenuItem::linkToRoute('Parser', 'fas fa-comments', 'parser');
         yield MenuItem::linkToRoute('Products', 'fas fa-home', 'products');
+        yield MenuItem::linkToCrud('Sellers', 'fas fa-home', Seller::class);
     }
 }
