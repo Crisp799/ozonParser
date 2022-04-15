@@ -35,9 +35,6 @@ class ParserServiceController extends AbstractController
         //$entityManager = $doctrine->getManager();
         $client = new Client();
         $response = $client->request('get', $url);
-        while($response->getStatusCode() !== 200) {
-            $response = $client->request('get', $url);
-        }
         $response = $response->getBody()->getContents();
         $crawler = new Crawler($response); //state-searchResultsV2-311178-default-1
         $jsonData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]')->outerHtml();

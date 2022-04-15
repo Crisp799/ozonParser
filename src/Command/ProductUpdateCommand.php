@@ -41,11 +41,14 @@ class ProductUpdateCommand extends Command
         //$io = new SymfonyStyle($input, $output);
         $repository = $this->entityManager->getRepository(Product::class);
         $dbData = $repository->findAll();//получил данные из базы данных
-
+        $count = 0;
         foreach ($dbData as $productData) {
             $service = new ParserServiceController($this->entityManager);
             $service -> updateProduct($productData);
+            ++$count;
         }
+        echo "$count updated";
+        echo PHP_EOL;
         return Command::SUCCESS;
     }
 }
