@@ -57,15 +57,13 @@ class ParserServiceController extends AbstractController
     public function pageParser(string $url): array
     {
         $client = new Client();
-        $response = $client->request('get', $url);
+        $response = $client->request('get', $url, array('connect_timeout' => 0));
         $response = $response->getBody()->getContents();
         $crawler = new Crawler($response);
 
-        $allData = $crawler->filterXPath('//*[@id="state-searchResultsV2-252189-default-1"]');
+        $allData = $crawler->filterXPath("//*[contains(concat(' ', @id, ' '), 'state-searchResultsV2')]");
 
-        $jsonData = $allData->outerHtml(); //  может начать ругаться на outerHtml() и выкидывать ошибку, для решения необходимо перезагрузить страницу
-        //  решить эту проблему без изменения класса crawler так и не получилось
-        //  из-за этого, чтобы уменьшить вероятность появление ошибки, количество страниц было ограничено
+        $jsonData = $allData->outerHtml();
 
         $encodeData = stristr($jsonData, '{"items');
         $encodeData = stristr($encodeData, '\'></div>', true);
